@@ -1,4 +1,6 @@
 import { E_NETWORKS } from "../constants/networks";
+import { ErrorService } from "./ErrorService";
+import { AddressData } from "../model";
 
 const getNetworkApiUrl = (network: E_NETWORKS) => {
 	let apiUrl = "";
@@ -16,23 +18,56 @@ const getNetworkApiUrl = (network: E_NETWORKS) => {
 	return apiUrl;
 };
 
+const fetchBalance = (apiUrl: string, address: string) => {
+	return fetch(`${apiUrl}&action=balance&address=${address}`);
+};
+
+const fetchTransactions = (apiUrl: string, address: string) => {
+	return fetch(`${apiUrl}&action=txlist&sort=desc&address=${address}`);
+};
+
+const fetchFullAddressData = (address: string, network: E_NETWORKS) => {
+	const apiUrl = getNetworkApiUrl(network);
+	const balance = fetchBalance(apiUrl, address);
+	const transactions = fetchTransactions(apiUrl, address);
+
+	return Promise.all([balance, transactions]);
+};
+
+const formatLastTransactions = (transactions: Array<{ value: string }>) => {
+	return transactions.slice(0, 5).map((tran) => tran.value);
+};
+
 export default {
 	fetchAddressData: async (
 		address: string,
 		network: E_NETWORKS
-	): Promise<string> => {
-		const apiUrl = getNetworkApiUrl(network);
-
+	): Promise<AddressData> => {
 		try {
-			const response = await fetch(
-				`${apiUrl}&action=balance&address=${address}`
-			);
+			const [
+				balancePromise,
+				transactionsPromise,
+			] = await fetchFullAddressData(address, network);
 
-			const value = await response.json();
-			return value.result;
+			const balance = await balancePromise.json();
+			const transactions = await transactionsPromise.json();
+			const response = {
+				balance: balance.result,
+				transactions: formatLastTransactions(transactions.result),
+				address: address,
+			};
+
+			return response;
 		} catch (err) {
-			console.log(err);
-			return "";
+			ErrorService.handleError(err);
+
+			const response = {
+				balance: "unknown",
+				transactions: [],
+				address: address,
+			};
+
+			return response;
 		}
 	},
 };

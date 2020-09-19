@@ -1,5 +1,6 @@
-import { AddressActions, AddressAction } from "../model";
+import { AddressActions } from "../model";
 import { E_NETWORKS } from "../constants/networks";
+import { ErrorService } from "../services/ErrorService";
 import ApiService from "../services/ApiService";
 
 interface SearchAddressInput {
@@ -7,58 +8,34 @@ interface SearchAddressInput {
 	network: E_NETWORKS;
 }
 
-export function startSearchAddress({ address, network }: SearchAddressInput) {
-	// SearchAddress({
-	// 	address,
-	// 	network,
-	// });
-
+export function searchAddress({ address, network }: SearchAddressInput) {
 	return async (dispatch: Function, getState: Function) => {
 		dispatch({
 			type: AddressActions.SEARCH_ADDRESS_LOADING,
 			payload: address,
 		});
 
-		let value = "";
-		let hasError = false;
+		dispatch({
+			type: AddressActions.ADD_ADDRESS_SEARCH,
+			payload: address,
+		});
 
 		try {
-			value = await ApiService.fetchAddressData(address, network);
-			console.log("result == ", value);
+			const value = await ApiService.fetchAddressData(address, network);
 
 			dispatch({
 				type: AddressActions.SEARCH_ADDRESS_SUCCESS,
 				payload: {
-					balance: value,
+					balance: value.balance,
+					transactions: value.transactions,
+					address: value.address,
 				},
 			});
 		} catch (err) {
-			hasError = true;
-		}
-	};
-
-	// return {
-	// 	type: AddressActions.SEARCH_ADDRESS_LOADING,
-	// 	payload: address,
-	// };
-}
-
-function SearchAddress({ address, network }: SearchAddressInput) {
-	return async (dispatch: Function, getState: Function) => {
-		let value = "";
-		let hasError = false;
-		try {
-			value = await ApiService.fetchAddressData(address, network);
-			console.log("result == ", value);
-
 			dispatch({
-				type: AddressActions.SEARCH_ADDRESS_SUCCESS,
-				payload: {
-					balance: value,
-				},
+				type: AddressActions.SEARCH_ADDRESS_ERROR,
 			});
-		} catch (err) {
-			hasError = true;
+			ErrorService.handleError(err);
 		}
 	};
 }

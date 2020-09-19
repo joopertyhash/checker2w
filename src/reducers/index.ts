@@ -1,16 +1,12 @@
 import { History } from "history";
 import { combineReducers } from "redux";
-import { Todo } from "../model";
-import * as todoReducer from "./todo";
-import * as searchAddressReducer from "./searchAddress";
+import * as addressesReducer from "./addresses";
 
 export interface RootState {
-	todoList: Todo[];
-	Addresses: string[];
+	addresses: addressesReducer.addressDataState;
 }
 
 export default (history: History) =>
 	combineReducers({
-		...todoReducer,
-		...searchAddressReducer,
+		...addressesReducer,
 	});

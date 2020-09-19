@@ -41,6 +41,5 @@ export function AddressField(props: Props) {
 const useStyles = makeStyles({
 	textField: {
 		width: "80%",
-		margin: 20,
 	},
 });

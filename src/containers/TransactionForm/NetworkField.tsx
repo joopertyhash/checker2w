@@ -1,6 +1,5 @@
 // prettier-ignore
 import { Select, MenuItem } from "@material-ui/core";
-import { makeStyles } from "@material-ui/styles";
 
 import * as React from "react";
 import { E_NETWORKS } from "../../constants/networks";
@@ -34,10 +33,3 @@ export function NetworkFeild(props: Props) {
 		</Select>
 	);
 }
-
-const useStyles = makeStyles({
-	textField: {
-		width: "80%",
-		margin: 20,
-	},
-});
