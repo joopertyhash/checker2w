@@ -46,6 +46,7 @@ export function TransactionSearchForm(props: Props) {
 				<PreviousSearches
 					values={addressData.previousSearches}
 					onClick={handlePreviousSearchClick}
+					onError={setHasInputError}
 				/>
 			</Grid>
 
@@ -61,6 +62,7 @@ export function TransactionSearchForm(props: Props) {
 					color="secondary"
 					onClick={handleSubmit}
 					variant="contained"
+					disabled={hasInputError ? true : false}
 				>
 					Search
 				</Button>

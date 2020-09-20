@@ -1,4 +1,4 @@
-# This is an test project for getting latest transactions from etherscan
+# This is a sample project for getting latest transactions out of etherscan
 
 Install it and run:
 
@@ -6,3 +6,10 @@ Install it and run:
 npm i
 npm start
 ```
+
+TODO:
+
+-   Add i18n support
+-   Finish unit tests
+-   Add spinners to display loading state
+-   Test in browserstack
