@@ -1,15 +1,16 @@
 import { E_NETWORKS } from "../constants/networks";
 import { ErrorService } from "./ErrorService";
 import { AddressData } from "../model";
+import { E_API_ENDPOINTS, NO_API_KEY_THROTTLE } from "../constants/api";
 
 const getNetworkApiUrl = (network: E_NETWORKS) => {
 	let apiUrl = "";
 	switch (network) {
 		case E_NETWORKS.Rinkeby:
-			apiUrl = "https://api-rinkeby.etherscan.io/api?module=account";
+			apiUrl = E_API_ENDPOINTS.Rinkeby;
 			break;
 		case E_NETWORKS.Manynet:
-			apiUrl = "https://api.etherscan.io/api?module=account";
+			apiUrl = E_API_ENDPOINTS.Manynet;
 			break;
 		default:
 			apiUrl = "";
@@ -22,8 +23,18 @@ const fetchBalance = (apiUrl: string, address: string) => {
 	return fetch(`${apiUrl}&action=balance&address=${address}`);
 };
 
-const fetchTransactions = (apiUrl: string, address: string) => {
-	return fetch(`${apiUrl}&action=txlist&sort=desc&address=${address}`);
+const fetchTransactions = (
+	apiUrl: string,
+	address: string
+): Promise<Response> => {
+	// TODO: add API key since parallel request is not allowed by api
+	return new Promise((resolve, _) => {
+		setTimeout(() => {
+			resolve(
+				fetch(`${apiUrl}&action=txlist&sort=desc&address=${address}`)
+			);
+		}, NO_API_KEY_THROTTLE);
+	});
 };
 
 const fetchFullAddressData = (address: string, network: E_NETWORKS) => {
@@ -35,7 +46,12 @@ const fetchFullAddressData = (address: string, network: E_NETWORKS) => {
 };
 
 const formatLastTransactions = (transactions: Array<{ value: string }>) => {
-	return transactions.slice(0, 5).map((tran) => tran.value);
+	let transactionsArray = [] as string[];
+	if (Array.isArray(transactions)) {
+		transactionsArray = transactions.slice(0, 5).map((tran) => tran.value);
+	}
+
+	return transactionsArray;
 };
 
 export default {
@@ -56,7 +72,7 @@ export default {
 				transactions: formatLastTransactions(transactions.result),
 				address: address,
 			};
-
+			console.log(121212, response);
 			return response;
 		} catch (err) {
 			ErrorService.handleError(err);
