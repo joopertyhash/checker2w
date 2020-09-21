@@ -11,6 +11,6 @@ TODO:
 
 -   Add i18n support
 -   Finish unit tests
-–   Review and fix node_modules vulnerabilities
+-   Review and fix node_modules vulnerabilities
 -   Add spinners to display loading state
 -   Test in browserstack
